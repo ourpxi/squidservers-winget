@@ -22,4 +22,4 @@ jobs:
           token: ${{ secrets.WINGET_TOKEN }}
           installer-type: exe
           scope: user
-          install-modes: [silent, silentWithProgress]
+          install-modes: silent
