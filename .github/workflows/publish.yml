@@ -1,1 +1,25 @@
-
+name: SquidServers WinGet
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+jobs:
+  check-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch CDN Metadata
+        id: cdn_data
+        run: |
+          curl -s https://cdn.squidservers.com/latest.yml -o latest.yml
+          VERSION=$(grep '^version:' latest.yml | awk '{print $2}')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Publish to WinGet
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: SquidServers.SquidServers
+          version: ${{ steps.cdn_data.outputs.version }}
+          installer-url: https://cdn.squidservers.com/squidservers-latest-setup.exe
+          token: ${{ secrets.WINGET_TOKEN }}
+          installer-type: exe
+          scope: user
+          install-modes: [silent, silentWithProgress]
